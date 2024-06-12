@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title>Japaty</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="./images/chatbot.jpg">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/devibeans.min.css">
+  <!-- Google Fonts Link For Icons -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
+</head>
+
+
+<body>
+  <div class="sidebar-container">
+    <div class="sidebar-wrapper">
+      <div class="sidebar">
+        <div class="sidebar-header">
+          <div id="sm-close-sidebar" onclick="closeSidebar()">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+              <path
+                d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
+            </svg>
+          </div>
+          <div id="new-chat" class="sidebar-item" onclick="handleSelectingChat(this)">
+            New-Chat
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar-toggler">
+      <span class="material-symbols-rounded">chevron_left</span>
+    </div>
+  </div>
+
+  <div id="sm-open-sidebar">
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+      <path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z" />
+    </svg>
+  </div>
+  <!-- Chats container -->
+  <div class="chat-container"></div>
+
+  <!-- Typing container -->
+  <div class="typing-container">
+    <!-- <div class="record-content">
+      <button class="play-pause">
+        <svg style="display: none;" xmlns="http://www.w3.org/2000/svg" height="30px" width="30px"
+          viewBox="0 -960 960 960" fill="black">
+          <path d="M320-200v-560l440 280-440 280Zm80-280Zm0 134 210-134-210-134v268Z" />
+        </svg>
+        <svg style="display: block;" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960"
+          width="24px" fill="black">
+          <path
+            d="M520-200v-560h240v560H520Zm-320 0v-560h240v560H200Zm400-80h80v-400h-80v400Zm-320 0h80v-400h-80v400Zm0-400v400-400Zm320 0v400-400Z" />
+        </svg>
+      </button>
+      <div>
+        <div>
+          record message
+        </div>
+        <div>.....................................................</div>
+      </div>
+      <button class="send-record">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000">
+          <path d="M120-160v-640l760 320-760 320Zm80-120 474-200-474-200v140l240 60-240 60v140Zm0 0v-400 400Z" />
+        </svg>
+      </button>
+    </div> -->
+    <div class="typing-content">
+      <div class="typing-dropdown">
+        <div id="dropdown">
+          <span id="selected-dropdown-menu-item">dropdown</span>
+          <span id="dropdown-icon" class="material-symbols-rounded">
+            expand_less
+          </span>
+        </div>
+        <div id="dropdown-menu" class="hide"></div>
+      </div>
+      <div class="typing-textarea">
+        <textarea id="chat-input" spellcheck="false" placeholder="Enter a prompt here" required></textarea>
+        <span id="send-btn" class="material-symbols-rounded">send</span>
+      </div>
+    </div>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="config.js"></script>
+<script src="function.js"></script>
+<script src="script.js"></script>
+
+</html>

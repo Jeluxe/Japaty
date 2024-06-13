@@ -35,10 +35,21 @@
     </div>
   </div>
 
-  <div id="sm-open-sidebar">
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+  <div id="sm-header">
+    <svg id="sm-open-sidebar" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+      fill="#e8eaed">
       <path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z" />
     </svg>
+
+    <div id="sm-dropdown-container">
+      <div id="sm-dropdown">
+        <span id="selected-sm-dropdown-menu-item">dropdown</span>
+        <span class="dropdown-icon material-symbols-rounded">
+          expand_more
+        </span>
+      </div>
+      <div id="sm-dropdown-menu" class="hide"></div>
+    </div>
   </div>
   <!-- Chats container -->
   <div class="chat-container"></div>
@@ -73,7 +84,7 @@
       <div class="typing-dropdown">
         <div id="dropdown">
           <span id="selected-dropdown-menu-item">dropdown</span>
-          <span id="dropdown-icon" class="material-symbols-rounded">
+          <span class="dropdown-icon material-symbols-rounded">
             expand_less
           </span>
         </div>

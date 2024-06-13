@@ -112,9 +112,16 @@ code {
   height: 50px;
 }
 
-#sm-open-sidebar {
+#sm-header {
   display: none;
   padding: 12px;
+}
+
+#sm-dropdown-container {
+  display: none;
+}
+
+#sm-open-sidebar {
   cursor: pointer;
 }
 
@@ -437,7 +444,8 @@ span.material-symbols-rounded {
   min-width: 200px;
 }
 
-#dropdown {
+#dropdown,
+#sm-dropdown {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -450,7 +458,8 @@ span.material-symbols-rounded {
 
 
 
-#dropdown span {
+#dropdown span,
+#sm-dropdown span {
   display: flex;
   justify-content: flex-start;
   width: 100%;
@@ -460,7 +469,8 @@ span.material-symbols-rounded {
   font-size: 16px;
 }
 
-#dropdown-menu {
+#dropdown-menu,
+#sm-dropdown-menu {
   display: flex;
   position: absolute;
   flex-direction: column;
@@ -486,6 +496,7 @@ span.material-symbols-rounded {
 
     &:last-child {
       border-bottom: 0;
+      border-top: 0 !important;
     }
   }
 }
@@ -494,7 +505,8 @@ span.material-symbols-rounded {
   padding-left: 15px;
 }
 
-#dropdown .material-symbols-rounded {
+#dropdown .material-symbols-rounded,
+#sm-dropdown .material-symbols-rounded {
   display: flex;
   justify-content: center;
   width: 30px;
@@ -537,8 +549,41 @@ span.material-symbols-rounded {
     display: none;
   }
 
-  #sm-open-sidebar {
+  .typing-dropdown {
+    display: none;
+  }
+
+  #sm-header {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  #sm-dropdown-container {
     display: block;
+    position: relative;
+    width: 200px;
+    color: var(--icon-color);
+
+  }
+
+  #sm-dropdown-container #sm-dropdown span {
+    padding: 0 5px;
+    align-items: center;
+  }
+
+  #sm-dropdown-container #sm-dropdown-menu {
+    transform: translateY(-24%);
+    flex-direction: column-reverse;
+  }
+
+  #sm-dropdown-container #sm-dropdown-menu span {
+    padding: 5px;
+    border-top: 1px solid #888888;
+    border-bottom: 0;
+  }
+
+  #sm-dropdown-container #sm-dropdown-menu span:first {
+    border: none;
   }
 
   #sm-close-sidebar {
@@ -581,8 +626,8 @@ span.material-symbols-rounded {
     padding: 10px 40px 10px 10px;
   }
 
-  #dropdown {
-    height: 45px;
+  #sm-dropdown {
+    height: 30px;
   }
 
   .typing-content span {

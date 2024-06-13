@@ -7,11 +7,12 @@ const sidebarToggler = document.querySelector(".sidebar-toggler");
 const chatContainer = document.querySelector(".chat-container");
 const randomButton = document.querySelector("#random-btn");
 const deleteButton = document.querySelector("#delete-btn");
-const openCloseButton = document.querySelector("#dropdown");
-const dropdownIcon = document.querySelector("#dropdown-icon");
-const dropdownMenu = document.querySelector("#dropdown-menu");
+const dropdown = document.querySelector("#dropdown")
+const smDropdown = document.querySelector("#sm-dropdown");
 const selectedDropdownMenuItem = document.querySelector("#selected-dropdown-menu-item");
+const selectedSmDropdownMenuItem = document.querySelector("#selected-sm-dropdown-menu-item");
 
+let dropdownMenu;
 let clonedPreviousElement;
 let selectedModel = { id: 4, model: "gpt-4o" };
 let isFirstSidebarInit = true;
@@ -38,6 +39,7 @@ const loadDataFromLocalstorage = async () => {
     }
 
     selectedDropdownMenuItem.textContent = selectedModel.model;
+    selectedSmDropdownMenuItem.textContent = selectedModel.model;
 
     renderSidebar({ selectedChatLS })
 
@@ -313,6 +315,8 @@ const handleSelectDropdownMenuItem = (e) => {
     e.preventDefault();
     e.stopPropagation();
     selectedDropdownMenuItem.textContent = e.target.textContent;
+    selectedSmDropdownMenuItem.textContent = e.target.textContent;
+
     const id = e.target.getAttribute("id");
     selectedModel = MODELS.find(item => item.id === Number(id))
     localStorage.setItem("model", JSON.stringify(selectedModel));
@@ -518,13 +522,18 @@ const clearClassSelected = () => {
 }
 
 const initializeDropdownData = () => {
+    const dropdownMenu = document.querySelector("#dropdown-menu")
+    const smDropdownMenu = document.querySelector("#sm-dropdown-menu")
     for (let index in MODELS) {
         const span = document.createElement("span");
         span.setAttribute("id", MODELS[index].id)
         span.classList.add("dropdown-menu-item");
         span.textContent = MODELS[index].model;
+        const clonedSpan = span.cloneNode(true)
         span.addEventListener("click", handleSelectDropdownMenuItem)
+        clonedSpan.addEventListener("click", handleSelectDropdownMenuItem)
         dropdownMenu.appendChild(span)
+        smDropdownMenu.appendChild(clonedSpan)
     }
 }
 
@@ -618,13 +627,6 @@ sidebarWrapper.addEventListener("click", (e) => {
     e.stopPropagation();
 });
 
-openCloseButton.addEventListener("click", (e) => {
-    e.stopPropagation()
-    isDropdownOpen = true;
-    dropdownMenu.classList.toggle("hide")
-    dropdownIcon.textContent = dropdownMenu.classList.contains("hide") ? "expand_more" : "expand_less"
-});
-
 sidebarToggler.addEventListener("click", (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -673,7 +675,26 @@ document.addEventListener('click', (e) => {
     }
 });
 
+const dropdownOpen = (e) => {
+    e.stopPropagation()
+    isDropdownOpen = true;
+    dropdownMenu.classList.toggle("hide")
+}
+
+dropdown.addEventListener("click", dropdownOpen);
+smDropdown.addEventListener("click", dropdownOpen);
+
+const setDropdown = (width) => {
+    dropdownMenu = width > 600 ? document.querySelector("#dropdown-menu") : document.querySelector("#sm-dropdown-menu");
+}
+
+window.addEventListener("resize", (e) => {
+    setDropdown(e.target.innerWidth)
+})
+
 document.addEventListener("DOMContentLoaded", () => {
+    console.log(window.innerWidth)
+    setDropdown(window.innerWidth)
     loadDataFromLocalstorage();
     initializeDropdownData()
 });

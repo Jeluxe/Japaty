@@ -563,7 +563,7 @@ span.material-symbols-rounded {
     position: relative;
     width: 200px;
     color: var(--icon-color);
-
+    z-index: 2;
   }
 
   #sm-dropdown-container #sm-dropdown span {

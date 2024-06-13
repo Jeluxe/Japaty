@@ -292,7 +292,7 @@ span.material-symbols-rounded {
   padding: 0 25px;
   color: var(--text-color);
   word-break: break-word;
-
+  line-height: 2;
 }
 
 .chat.outgoing .message-content {

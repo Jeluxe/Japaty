@@ -253,18 +253,18 @@ const formattedHTML = (role, type = "text", message = null, loading = false) => 
 
     return `
     <div class='chat ${role === "user" ? "outgoing" : "incoming"}'>
-    <div class="chat-content">
-        <div class="chat-details">
+    <div class="chat-content">` +
+        `<div class="chat-details">
             ${role === "user" ? `<img src="images/monica.jpg" alt="monica-img"></img>` : `<img src="images/chatbot.jpg" alt="chatbot-img"></img>`}
-                <div class="message-content">`+
-        `${role === "assistant" && loading && message === null ?
+            <div class="message-content">${role === "assistant" && loading && message === null ?
             `<div class="typing-animation">
-                        <div class="typing-dot" style="--delay: 0.2s"></div>
-                        <div class="typing-dot" style="--delay: 0.3s"></div>
-                        <div class="typing-dot" style="--delay: 0.4s"></div>
-                    </div>` : createFormattedMessage(type, message, role === "user")}
-                    </div>
-                <span onclick="copyResponse(this,'${type === "text" ? "div" : ".message-content img"}')" class="material-symbols-rounded copy-btn">content_copy</span>
+                <div class="typing-dot" style="--delay: 0.2s"></div>
+                <div class="typing-dot" style="--delay: 0.3s"></div>
+                <div class="typing-dot" style="--delay: 0.4s"></div>
+            </div>` :
+            createFormattedMessage(type, message, role === "user")
+        }</div>` +
+        `<span onclick="copyResponse(this,'${type === "text" ? "div" : ".message-content img"}')" class="material-symbols-rounded copy-btn">content_copy</span>
             </div>
         </div>
     </div>`;

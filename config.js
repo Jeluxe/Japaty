@@ -13,7 +13,7 @@ const CONFIG = {
   // newLineBeforeRegex: /(#\s\w+\s\:\s-\s|\.\s-\s|\s-\s)/g,
   REMOVE_NEW_LINE_AFTER_PRE_TAG_REGEX: /(<\/pre>)(<br\/>)/g,
   BOLD_REGEX: /\*\*(.*?)\*\*/g,
-  HEADING_REGEX: /(#+)\s(\w+.*?)(<br\/>)/g,
+  HEADING_REGEX: /(#+)\s(\<?\w+.*?)(<br\/>)/g,
   UNDERLINING_REGEX: /\n_([^\s]+)/g,
   CODE_REGEX: /(?:\`)(.*?)(?:\`)/g,
   EXTRACT_IMAGE_REGEX: /^(img:\s)(.*)/g,

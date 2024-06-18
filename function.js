@@ -35,9 +35,8 @@ const codeFormatter = (message) => {
     idx++;
     return temp;
   })
-  console.log(formatted)
-  formatted = formatted
-    .replaceAll(CODE_REGEX, "<code>$2</code>")
+
+  formatted = formatted.replaceAll(CODE_REGEX, "<code>$2</code>")
 
   Object.values(saved).forEach((item, idx) =>
     formatted = formatted.replace(`<div class='placeholder-${idx}'/>`, item)

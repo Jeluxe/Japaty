@@ -71,8 +71,8 @@ const render = (selectedChat) => {
     chatContainer.scrollTo(0, chatContainer.scrollHeight); // Scroll to bottom of the chat container
 }
 
-const saveToLocalStorage = async ({ selectedChatID = null, type = null, value = null, messages = null, edited = false }) => {
-    if (type === 'chat-name') {
+const saveToLocalStorage = async ({ selectedChatID = null, type = null, value = null, messages = null }) => {
+    if (type === 'chat-title') {
         chats[selectedChatID].name = value;
     } else {
         if (selectedChatID === "new-chat" || selectedChatID === null) {
@@ -90,7 +90,7 @@ const saveToLocalStorage = async ({ selectedChatID = null, type = null, value = 
             chats[selectedChatID].messages = messages;
         }
     }
-    if (edited && (selectedChatID !== "new-chat" || selectedChatID !== null)) {
+    if ((type === 'chat-title' || messages !== null) && selectedChatID !== "new-chat" && selectedChatID !== null) {
         chats[selectedChatID].edited_at = Date.now();
     }
 
@@ -296,7 +296,7 @@ const formattedMessage = (newMessage, isUser = false) => {
 
     newMessage = newMessage.replaceAll(HEADING_REGEX, "<h" + "$1".length + ">$2</h" + "$1".length + ">");
 
-    newMessage = newMessage.replaceAll(LINK_REGEX, `<a href="$2">$1</a> `)
+    newMessage = newMessage.replaceAll(LINK_REGEX, `<a href="$2" target="_blank">$1</a> `)
 
     newMessage = newMessage.replaceAll(UNDERLINING_REGEX, "<u>$1</u>");
 
@@ -419,7 +419,7 @@ const handleEdit = (e) => {
     const chatID = sidebarItem.getAttribute("id")
 
     if (chats[chatID].name !== inputValue) {
-        saveToLocalStorage({ selectedChatID: chatID, type: "chat-name", value: inputValue, edited: true })
+        saveToLocalStorage({ selectedChatID: chatID, type: "chat-title", value: inputValue })
         rerenderSidebarItem(e, inputValue)
     } else {
         rerenderSidebarItem(e)
@@ -652,9 +652,6 @@ sidebar.addEventListener('click', function (e) {
 });
 
 document.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
     if (isDropdownOpen) {
         isDropdownOpen = false;
         dropdownMenu.classList.add("hide");

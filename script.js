@@ -12,6 +12,7 @@ const smDropdown = document.querySelector("#sm-dropdown");
 const selectedDropdownMenuItem = document.querySelector("#selected-dropdown-menu-item");
 const selectedSmDropdownMenuItem = document.querySelector("#selected-sm-dropdown-menu-item");
 
+let isSmallDevice = false;
 let dropdownMenu;
 let clonedPreviousElement;
 let selectedModel = { id: 4, model: "gpt-4o" };
@@ -598,10 +599,14 @@ const sortChatsByDates = (chats) => {
     return sortedChats;
 }
 
-chatInput.addEventListener("input", () => {
+chatInput.addEventListener("input", (e) => {
     // Adjust the height of the input field dynamically based on its content
-    chatInput.style.height = `${initialInputHeight}px`;
-    chatInput.style.height = `${chatInput.scrollHeight}px`;
+    if (e.target.value.trim() === "") {
+        chatInput.style.height = isSmallDevice ? "45px" : "55px";
+    } else {
+        chatInput.style.height = `${initialInputHeight}px`;
+        chatInput.style.height = `${e.target.scrollHeight}px`;
+    }
 });
 
 chatInput.addEventListener("keydown", (e) => {
@@ -674,16 +679,19 @@ dropdown.addEventListener("click", dropdownOpen);
 smDropdown.addEventListener("click", dropdownOpen);
 
 const setDropdown = (width) => {
-    dropdownMenu = width > 600 ? document.querySelector("#dropdown-menu") : document.querySelector("#sm-dropdown-menu");
+    dropdownMenu = width ? document.querySelector("#dropdown-menu") : document.querySelector("#sm-dropdown-menu");
 }
 
-window.addEventListener("resize", (e) => {
-    setDropdown(e.target.innerWidth)
-})
+const onResize = () => {
+    const width = window.innerWidth;
+    isSmallDevice = width <= 600;
+    setDropdown(isSmallDevice);
+}
+
+window.addEventListener("resize", onResize)
 
 document.addEventListener("DOMContentLoaded", () => {
-    console.log(window.innerWidth)
-    setDropdown(window.innerWidth)
+    onResize()
     loadDataFromLocalstorage();
     initializeDropdownData()
 });

@@ -284,29 +284,21 @@ const formattedMessage = (newMessage, isUser = false) => {
 
     newMessage = codeBlockFormatter(newMessage)
 
-    if (ANY_WHITESPACE_NEW_LINE_REGEX.test(newMessage)) {
-        newMessage = formatNewLine(newMessage)
-    }
+    newMessage = formatNewLine(newMessage)
 
-    if (REMOVE_NEW_LINE_AFTER_PRE_TAG_REGEX.test(newMessage)) {
-        newMessage = newMessage.replaceAll(REMOVE_NEW_LINE_AFTER_PRE_TAG_REGEX, "$1");
-    }
+    newMessage = newMessage.replaceAll(REMOVE_NEW_LINE_AFTER_PRE_TAG_REGEX, "$1");
 
-    if (BOLD_REGEX.test(newMessage)) {
-        newMessage = newMessage.replaceAll(BOLD_REGEX, "<b>$1</b>");
-    }
+    newMessage = newMessage.replaceAll(BOLD_REGEX, "<b>$1</b>");
 
     newMessage = displayColor(newMessage);
 
     newMessage = !isUser ? codeFormatter(newMessage) : newMessage;
 
-    if (HEADING_REGEX.test(newMessage)) {
-        newMessage = newMessage.replaceAll(HEADING_REGEX, "<h" + "$1".length + ">$2</h" + "$1".length + ">");
-    }
+    newMessage = newMessage.replaceAll(HEADING_REGEX, "<h" + "$1".length + ">$2</h" + "$1".length + ">");
 
-    if (UNDERLINING_REGEX.test(newMessage)) {
-        newMessage = newMessage.replaceAll(UNDERLINING_REGEX, "<u>$1</u>");
-    }
+    newMessage = newMessage.replaceAll(LINK_REGEX, `<a href="$2">$1</a> `)
+
+    newMessage = newMessage.replaceAll(UNDERLINING_REGEX, "<u>$1</u>");
 
     return newMessage;
 }

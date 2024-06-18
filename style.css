@@ -20,6 +20,10 @@ html {
   --incoming-chat-border: #444654;
 }
 
+a {
+  color: #4e98f4;
+}
+
 body {
   height: 100dvh;
   display: flex;

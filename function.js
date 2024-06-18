@@ -1,10 +1,7 @@
 const codeBlockFormatter = (message) => {
-  if (CODE_BLOCK_REGEX.test(message)) {
-    return message.replaceAll(CODE_BLOCK_REGEX, (_, g1, g2) => {
-      return `<pre class='language-${g1}'><div class='pre-header'>${g1}<span onclick='copyResponse(this)' class='material-symbols-rounded'>content_copy</span></div><code class='language-${g1} hljs'>${g1 === "regex" ? "<span class='hljs-regexp'>" + g2 + "</span>" : g2}</code></pre>`
-    });
-  }
-  return message
+  return message.replaceAll(CODE_BLOCK_REGEX, (_, g1, g2) => {
+    return `<pre class='language-${g1}'><div class='pre-header'>${g1}<span onclick='copyResponse(this)' class='material-symbols-rounded'>content_copy</span></div><code class='language-${g1} hljs'>${g1 === "regex" ? "<span class='hljs-regexp'>" + g2 + "</span>" : g2}</code></pre>`.replaceAll(/(\s+?)(\<\/code\>\<\/pre\>)/g, "$2")
+  });
 }
 
 const formatNewLine = (message) => {
@@ -32,19 +29,21 @@ const formatNewLine = (message) => {
 const codeFormatter = (message) => {
   let saved = {};
   let idx = 0;
-  let formated = message.replace(EXTRACT_CODE_BLOCK_REGEX, (match) => {
+  let formatted = message.replace(EXTRACT_CODE_BLOCK_REGEX, (match) => {
     saved[idx] = match;
     const temp = `<div class='placeholder-${idx}'/>`
     idx++;
     return temp;
   })
-  formated = formated.replaceAll(CODE_REGEX, "<code>$1</code>");
+  console.log(formatted)
+  formatted = formatted
+    .replaceAll(CODE_REGEX, "<code>$2</code>")
 
   Object.values(saved).forEach((item, idx) =>
-    formated = formated.replace(`<div class='placeholder-${idx}'/>`, item)
+    formatted = formatted.replace(`<div class='placeholder-${idx}'/>`, item)
   )
 
-  return formated
+  return formatted
 }
 
 const displayColor = (message) => {

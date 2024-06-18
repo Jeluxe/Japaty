@@ -293,6 +293,7 @@ span.material-symbols-rounded {
 }
 
 .chat .chat-details .message-content {
+  min-width: 0;
   width: 100%;
   max-width: 1080px;
   font-size: 1.05rem;

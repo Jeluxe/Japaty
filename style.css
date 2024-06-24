@@ -541,7 +541,7 @@ span.material-symbols-rounded {
 }
 
 /* Reponsive Media Query */
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 768px) {
   .sidebar-wrapper {
     width: 100vw;
   }
@@ -601,12 +601,21 @@ span.material-symbols-rounded {
     font-size: 0.95rem !important;
   }
 
-  .chat-container .chat img {
-    height: 32px;
-    width: 32px;
+  .chat {
+    padding: 15px 8px !important;
   }
 
-  .chat-container .chat p {
+  .message-content {
+    padding: 0 8px !important;
+    ;
+  }
+
+  .chat img {
+    height: 24px;
+    width: 24px;
+  }
+
+  .chat p {
     padding: 0 20px;
   }
 

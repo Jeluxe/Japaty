@@ -678,14 +678,10 @@ const dropdownOpen = (e) => {
 dropdown.addEventListener("click", dropdownOpen);
 smDropdown.addEventListener("click", dropdownOpen);
 
-const setDropdown = (width) => {
-    dropdownMenu = width ? document.querySelector("#dropdown-menu") : document.querySelector("#sm-dropdown-menu");
-}
-
 const onResize = () => {
-    const width = window.innerWidth;
-    isSmallDevice = width <= 600;
-    setDropdown(isSmallDevice);
+    dropdownMenu = window.innerWidth > 600 ?
+        document.querySelector("#dropdown-menu") :
+        document.querySelector("#sm-dropdown-menu");
 }
 
 window.addEventListener("resize", onResize)

@@ -15,7 +15,7 @@ const selectedDropdownMenuItem = document.querySelector("#selected-dropdown-menu
 const selectedSmDropdownMenuItem = document.querySelector("#selected-sm-dropdown-menu-item");
 const dragZone = document.querySelector(".drag-zone");
 const dropZone = document.querySelector(".drop-zone");
-const fileInput = document.querySelector("#image-input");
+const fileUpload = document.querySelector("#image-upload");
 const imageInputContainer = document.getElementsByClassName("image-input-container")[0];
 
 let file = null;
@@ -732,6 +732,11 @@ dropZone.addEventListener("drop", (e) => {
 
     file = e.dataTransfer.files[0];
     showFile()
+})
+
+fileUpload.addEventListener("change", e => {
+    file = e.target.files[0]
+    showFile();
 })
 
 const showFile = () => {

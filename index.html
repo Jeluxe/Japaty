@@ -17,7 +17,6 @@
   <div class="drag-zone">
     <div class="drop-zone">
       <header>Drag & Drop to Upload File</header>
-      <input type="file" id="image-input" accept="image/*" hidden />
     </div>
   </div>
   <div class="sidebar-container">
@@ -96,6 +95,14 @@
           </span>
         </div>
         <div id="dropdown-menu" class="hide"></div>
+      </div>
+      <div class="typing-upload">
+        <label for="image-upload">
+          <span class="dropdown-icon material-symbols-rounded">
+            upload
+          </span>
+        </label>
+        <input type="file" id="image-upload" hidden />
       </div>
       <div class="typing-textarea">
         <textarea id="chat-input" spellcheck="false" placeholder="Enter a prompt here" required></textarea>

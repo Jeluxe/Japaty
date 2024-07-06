@@ -482,8 +482,9 @@ span.material-symbols-rounded {
 
 .typing-upload {
   border-radius: 6px;
-  background: var(--main-bacground);
   margin-right: 10px;
+  background: var(--main-bacground);
+  outline: 1px solid var(--incoming-chat-border);
 }
 
 .typing-dropdown {

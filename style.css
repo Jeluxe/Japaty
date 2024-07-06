@@ -594,10 +594,24 @@ span.material-symbols-rounded {
 .drop-zone {
   width: 350px;
   height: 350px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background: #000;
   border-radius: 6px;
   border: 10px dashed white;
-  outline: 40px solid black;
+  color: #fff;
+  padding: 20px;
+}
+
+.drop-zone>header {
+  font-weight: 900;
+  font-size: 50px;
+}
+
+.drop-zone>header,
+.chat-details>img {
+  pointer-events: none;
 }
 
 /* Reponsive Media Query */

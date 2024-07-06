@@ -701,31 +701,31 @@ body.addEventListener('click', (e) => {
 
 body.addEventListener("dragover", (e) => {
     e.preventDefault();
-    e.stopPropagation();
 
     isDragging = true;
     dragZone.style.display = "flex"
 })
 
-dragZone.addEventListener("dragleave", (e) => {
+body.addEventListener("drop", (e) => {
     e.preventDefault();
-    e.stopPropagation();
 
     isDragging = false;
     dragZone.style.display = "none"
 })
 
-body.addEventListener("drop", (e) => {
+dropZone.addEventListener("dragenter", e => {
     e.preventDefault();
-    e.stopPropagation();
 
-    isDragging = false;
-    dragZone.style.display = "none"
+    dropZone.children[0].innerHTML = "Release To Upload"
+})
+dropZone.addEventListener("dragleave", e => {
+    e.preventDefault();
+
+    dropZone.children[0].innerHTML = "Drag & Drop to Upload File"
 })
 
 dropZone.addEventListener("drop", (e) => {
     e.preventDefault();
-    e.stopPropagation();
 
     isDragging = false;
     dragZone.style.display = "none"
@@ -735,6 +735,8 @@ dropZone.addEventListener("drop", (e) => {
 })
 
 const showFile = () => {
+    if (!file) return;
+
     let fileType = file.type;
     let validExtensions = ["image/jpeg", "image/jpg", "image/png"];
     if (validExtensions.includes(fileType) && imageList.length < 10) {

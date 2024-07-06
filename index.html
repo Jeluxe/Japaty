@@ -14,6 +14,12 @@
 
 
 <body>
+  <div class="drag-zone">
+    <div class="drop-zone">
+      <header>Drag & Drop to Upload File</header>
+      <input type="file" id="image-input" accept="image/*" hidden />
+    </div>
+  </div>
   <div class="sidebar-container">
     <div class="sidebar-wrapper">
       <div class="sidebar">
@@ -56,6 +62,7 @@
 
   <!-- Typing container -->
   <div class="typing-container">
+    <div class="image-input-container"></div>
     <!-- <div class="record-content">
       <button class="play-pause">
         <svg style="display: none;" xmlns="http://www.w3.org/2000/svg" height="30px" width="30px"

@@ -1,3 +1,4 @@
+const body = document.getElementsByTagName("body")[0];
 const chatInput = document.querySelector("#chat-input");
 const sendButton = document.querySelector("#send-btn");
 const menuButton = document.querySelector("#sm-open-sidebar");
@@ -5,16 +6,24 @@ const sidebarWrapper = document.querySelector(".sidebar-wrapper");
 const sidebar = document.querySelector(".sidebar");
 const sidebarToggler = document.querySelector(".sidebar-toggler");
 const chatContainer = document.querySelector(".chat-container");
+const removeImageButtons = document.getElementsByClassName("remove-image-buttons");
 const randomButton = document.querySelector("#random-btn");
 const deleteButton = document.querySelector("#delete-btn");
 const dropdown = document.querySelector("#dropdown")
 const smDropdown = document.querySelector("#sm-dropdown");
 const selectedDropdownMenuItem = document.querySelector("#selected-dropdown-menu-item");
 const selectedSmDropdownMenuItem = document.querySelector("#selected-sm-dropdown-menu-item");
+const dragZone = document.querySelector(".drag-zone");
+const dropZone = document.querySelector(".drop-zone");
+const fileInput = document.querySelector("#image-input");
+const imageInputContainer = document.getElementsByClassName("image-input-container")[0];
 
+let file = null;
+let imageList = [];
 let isSmallDevice = false;
 let dropdownMenu;
 let clonedPreviousElement;
+let isDragging = false;
 let selectedModel = { id: 4, model: "gpt-4o" };
 let isFirstSidebarInit = true;
 let isInputOpen = false;
@@ -28,6 +37,7 @@ let messages = [];
 let prompt = null;
 let imageResolution = null;
 let urlArray = { text: TEXT_API, image: IMAGE_API };
+
 
 const loadDataFromLocalstorage = async () => {
     const selectedChatLS = JSON.parse(localStorage.getItem("selected-chat"));
@@ -133,9 +143,7 @@ const createResponse = async ({ body }) => {
 }
 
 const getChatResponse = async (incomingChatDiv, selectedChatID) => {
-    const divElement = document.createElement("div");
-    divElement.classList.add("message-content");
-
+    const messageContent = incomingChatDiv.querySelector(".message-content");
     try {
         const body = createResponseBody({
             model: selectedModel.model,
@@ -166,7 +174,6 @@ const getChatResponse = async (incomingChatDiv, selectedChatID) => {
                 { alt: userMessage, image: newMessage } :
                 newMessage,
         });
-        saveToLocalStorage({ selectedChatID, messages })
 
         if (selectedContentType === 'text') {
             newMessage = formattedMessage(newMessage);
@@ -175,16 +182,16 @@ const getChatResponse = async (incomingChatDiv, selectedChatID) => {
         }
 
         if (selectedChat === selectedChatID) {
-            divElement.innerHTML = newMessage;
-            highlightCode(divElement)
+            messageContent.innerHTML = newMessage;
+            highlightCode(messageContent)
         }
+
+        saveToLocalStorage({ selectedChatID, messages })
     } catch (error) {
-        divElement.classList.add("error");
-        divElement.textContent = `${error.message}. Please try again.`;
+        messageContent.classList.add("error");
+        messageContent.textContent = `${error.message}. Please try again.`;
     } finally {
         document.title = "Japaty"
-        incomingChatDiv.querySelector(".message-content").remove();
-        incomingChatDiv.querySelector(".chat-details").appendChild(divElement);
         chatContainer.scrollTo(0, chatContainer.scrollHeight);
     }
 }
@@ -207,6 +214,9 @@ const copyResponse = (copyBtn, type) => {
 
 const showTypingAnimation = () => {
     // Display the typing animation and call the getChatResponse function
+    imageList = [];
+    imageInputContainer.innerHTML = "";
+    imageInputContainer.style.display = "none";
     const html = formattedHTML("assistant", selectedContentType, null, true);
     chatContainer.innerHTML += html;
     chatContainer.scrollTo(0, chatContainer.scrollHeight);
@@ -218,7 +228,6 @@ const handleOutgoingChat = () => {
     userMessage = chatInput.value.trim(); // Get chatInput value and remove extra spaces
     if (!userMessage) return;
 
-    let defaultText = userMessage;
     selectedContentType = "text";
 
     if (EXTRACT_IMAGE_REGEX.test(userMessage)) {
@@ -226,11 +235,15 @@ const handleOutgoingChat = () => {
         selectedContentType = "image";
     }
 
-    messages.push({
+    const userMessageContent = {
         role: "user",
         type: "text",
-        content: defaultText,
-    });
+        content: [{ type: "text", text: userMessage }].concat(imageList),
+    }
+
+    let tempMessage = [...userMessageContent.content]
+
+    messages.push(userMessageContent);
 
     if (selectedChat) {
         saveToLocalStorage({ selectedChatID: selectedChat })
@@ -240,7 +253,7 @@ const handleOutgoingChat = () => {
     chatInput.style.height = `${initialInputHeight}px`;
     chatContainer.querySelector(".default-text")?.remove();
     if (selectedChat === 'new-chat' || selectedChat === null) {
-        const html = formattedHTML("user", "text", defaultText);
+        const html = formattedHTML("user", "text", tempMessage);
         chatContainer.innerHTML += html;
     }
     chatContainer.scrollTo(0, chatContainer.scrollHeight);
@@ -273,12 +286,25 @@ const formattedHTML = (role, type = "text", message = null, loading = false) => 
 
 const createFormattedMessage = (type, message, isUser) => {
     const newDiv = document.createElement("div");
-    newDiv.innerHTML = `${type === "text" ? formattedMessage(message, isUser) : `<img src="${message.image}" alt="${message.alt}" />`}`
+    newDiv.innerHTML = `${isUser ?
+        formatUserMessage(type, message) :
+        formattedMessage(message)}`;
+
     highlightCode(newDiv);
     return newDiv.innerHTML;
 }
 
-const formattedMessage = (newMessage, isUser = false) => {
+const formatUserMessage = (type, message) => {
+    return type === "text" ?
+        (Array.isArray(message) ? `<div class="message-images">` +
+            message.filter((_, idx) => idx !== 0).map(img => {
+                return `<img src="${img.image_url.url}" />`
+            }) : "") +
+        `</div>` +
+        `<p>${message[0].text}</p>` : `<img src="${message.image}" alt="${message.alt}" />`
+}
+
+const formattedMessage = (newMessage) => {
     newMessage = newMessage.replaceAll(ANGLE_BRACKET_REGEX, (match) => {
         return match === "<" ? "&lt;" : "&gt;"
     });
@@ -293,7 +319,7 @@ const formattedMessage = (newMessage, isUser = false) => {
 
     newMessage = displayColor(newMessage);
 
-    newMessage = !isUser ? codeFormatter(newMessage) : newMessage;
+    newMessage = codeFormatter(newMessage);
 
     newMessage = newMessage.replaceAll(HEADING_REGEX, "<h" + "$1".length + ">$2</h" + "$1".length + ">");
 
@@ -656,7 +682,10 @@ sidebar.addEventListener('click', function (e) {
     }
 });
 
-document.addEventListener('click', (e) => {
+body.addEventListener('click', (e) => {
+    if (isDragging) {
+        return;
+    }
     if (isDropdownOpen) {
         isDropdownOpen = false;
         dropdownMenu.classList.add("hide");
@@ -668,6 +697,82 @@ document.addEventListener('click', (e) => {
         removeInputs();
     }
 });
+
+
+body.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    isDragging = true;
+    dragZone.style.display = "flex"
+})
+
+dragZone.addEventListener("dragleave", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    isDragging = false;
+    dragZone.style.display = "none"
+})
+
+body.addEventListener("drop", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    isDragging = false;
+    dragZone.style.display = "none"
+})
+
+dropZone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    isDragging = false;
+    dragZone.style.display = "none"
+
+    file = e.dataTransfer.files[0];
+    showFile()
+})
+
+const showFile = () => {
+    let fileType = file.type;
+    let validExtensions = ["image/jpeg", "image/jpg", "image/png"];
+    if (validExtensions.includes(fileType) && imageList.length < 10) {
+        imageInputContainer.style.display = "flex";
+        let fileReader = new FileReader();
+        fileReader.onload = () => {
+            let fileURL = fileReader.result;
+            imageList.push({ type: "image_url", image_url: { url: fileURL, detail: "high" } })
+
+            let imageWrapper = document.createElement("div");
+            let img = document.createElement("img");
+            let removeBtn = document.createElement("button");
+
+            imageWrapper.classList.add("image-wrapper")
+            removeBtn.classList.add("remove-image-buttons");
+            img.src = fileURL;
+            removeBtn.innerHTML = "X"
+            removeBtn.onclick = removeImage;
+
+            imageWrapper.appendChild(img)
+            imageWrapper.appendChild(removeBtn)
+
+            imageInputContainer.appendChild(imageWrapper)
+        }
+        fileReader.readAsDataURL(file);
+    } else {
+        alert("puu puu not valid file type")
+    }
+}
+
+const removeImage = (e) => {
+    imageList = imageList.filter(img => img.image_url !== e.target.previousSibling.src)
+    e.target.parentElement.remove();
+
+    if (imageList.length === 0) {
+        imageInputContainer.style.display = "none";
+    }
+}
 
 const dropdownOpen = (e) => {
     e.stopPropagation()

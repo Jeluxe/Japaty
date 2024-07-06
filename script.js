@@ -301,7 +301,7 @@ const formatUserMessage = (type, message) => {
                 return `<img src="${img.image_url.url}" />`
             }) : "") +
         `</div>` +
-        `<p>${message[0].text}</p>` : `<img src="${message.image}" alt="${message.alt}" />`
+        `<p>${message[0].text || message}</p>` : `<img src="${message.image}" alt="${message.alt}" />`
 }
 
 const formattedMessage = (newMessage) => {

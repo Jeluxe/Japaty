@@ -766,7 +766,7 @@ const showFile = () => {
 }
 
 const removeImage = (e) => {
-    imageList = imageList.filter(img => img.image_url !== e.target.previousSibling.src)
+    imageList = imageList.filter(img => img.image_url.url !== e.target.previousSibling.src)
     e.target.parentElement.remove();
 
     if (imageList.length === 0) {

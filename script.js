@@ -364,7 +364,7 @@ const createNewChat = async ({ id, name, category, before = false, selectedID = 
     deleteButton.textContent = "delete";
 
     if (firstMessage) {
-        const messageToSummarize = { role: "user", content: messages[0].content };
+        const messageToSummarize = { role: "user", content: messages[1].content };
         messageToSummarize.content = `summarize in 1-5 words this message: ${messageToSummarize.content}`
         delete messageToSummarize.type;
 

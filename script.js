@@ -421,7 +421,7 @@ const editChatName = (e) => {
     cancelIcon.textContent = "close";
     cancelIcon.addEventListener("click", rerenderSidebarItem);
     clonedPreviousElement = parentElement.cloneNode(true);
-    tempInput.value = parentElement.textContent.split("\n")[0] || "";
+    tempInput.value = parentElement.querySelector("span.sidebar-item-title").textContent || "";
     tempInput.setAttribute("autofocus", true);
     tempInput.addEventListener("click", (e) => e.stopPropagation());
     tempInput.addEventListener("input", (e) => {

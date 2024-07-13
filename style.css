@@ -162,6 +162,11 @@ code {
 }
 
 .sidebar-item .actions-container {
+  display: none;
+}
+
+.sidebar-item:hover .actions-container,
+.sidebar-item:has(input) .actions-container {
   display: flex;
 }
 

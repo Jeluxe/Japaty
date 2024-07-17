@@ -75,7 +75,7 @@ const render = (selectedChat) => {
         messages = chats[selectedChat]?.messages;
         for (let message in messages) {
             const { role, type, content } = messages[message];
-            contentText += formattedHTML(role, type, content);
+            contentText += formattedHTML({ role, type, content });
         }
     }
     chatContainer.innerHTML = contentText;
@@ -110,23 +110,23 @@ const saveToLocalStorage = async ({ selectedChatID = null, type = null, value = 
     renderSidebar({ edited: true })
 }
 
-const createResponseBody = ({ model, selectedContentType, messages, prompt }) => {
-    return JSON.stringify(selectedContentType === "text" ? {
+const createResponseBody = ({ model, selectedContentType, messages, prompt, gpt3 = false }) => {
+    const defaultTextResponseProperties = {
         model,
         messages,
-        temperature: 1,
-        max_tokens: 1256,
-        top_p: 1,
-        n: 1,
-        presence_penalty: 0,
-        frequency_penalty: 0,
-    } : {
+        max_tokens: 1480,
+    }
+
+    const defaultImageResponseProperties = {
         prompt,
-        model: "dall-e-3",
+        model: DALLE2_RESOLUTIONS.includes(imageResolution) ? "dall-e-2" : "dall-e-3",
         size: imageResolution ?? "1792x1024",
-        quality: "hd",
-        n: 1
-    })
+    }
+
+    return JSON.stringify(selectedContentType === "text" ?
+        defaultTextResponseProperties :
+        defaultImageResponseProperties
+    )
 }
 
 const createResponse = async ({ body }) => {
@@ -178,7 +178,7 @@ const getChatResponse = async (incomingChatDiv, selectedChatID) => {
         if (selectedContentType === 'text') {
             newMessage = formattedMessage(newMessage);
         } else {
-            newMessage = `<img src="${newMessage}" alt="${userMessage.split("img: ")[1]}" width="512" height=width="512" />`
+            newMessage = `<img src="${newMessage}" alt="${userMessage.split("img: ")[1]}" />`
         }
 
         if (selectedChat === selectedChatID) {
@@ -217,50 +217,76 @@ const showTypingAnimation = () => {
     imageList = [];
     imageInputContainer.innerHTML = "";
     imageInputContainer.style.display = "none";
-    const html = formattedHTML("assistant", selectedContentType, null, true);
-    chatContainer.innerHTML += html;
-    chatContainer.scrollTo(0, chatContainer.scrollHeight);
+
+    createMessageElement({ role: "assistant", type: selectedContentType, content: null, loading: true })
     const lastElement = chatContainer.lastElementChild;
     getChatResponse(lastElement, selectedChat);
 }
 
-const handleOutgoingChat = () => {
-    userMessage = chatInput.value.trim(); // Get chatInput value and remove extra spaces
-    if (!userMessage) return;
-
-    selectedContentType = "text";
-
-    if (EXTRACT_IMAGE_REGEX.test(userMessage)) {
-        userMessage = userMessage.replace(EXTRACT_IMAGE_REGEX, "$2");
-        selectedContentType = "image";
-    }
-
-    const userMessageContent = {
-        role: "user",
-        type: "text",
-        content: [{ type: "text", text: userMessage }].concat(imageList),
-    }
-
-    let tempMessage = [...userMessageContent.content]
-
-    messages.push(userMessageContent);
-
-    if (selectedChat) {
-        saveToLocalStorage({ selectedChatID: selectedChat })
-    }
-
-    chatInput.value = "";
-    chatInput.style.height = `${initialInputHeight}px`;
-    chatContainer.querySelector(".default-text")?.remove();
-    if (selectedChat === 'new-chat' || selectedChat === null) {
-        const html = formattedHTML("user", "text", tempMessage);
-        chatContainer.innerHTML += html;
-    }
+const createMessageElement = (props) => {
+    const html = formattedHTML(props);
+    chatContainer.innerHTML += html;
     chatContainer.scrollTo(0, chatContainer.scrollHeight);
-    setTimeout(showTypingAnimation, 500);
 }
 
-const formattedHTML = (role, type = "text", message = null, loading = false) => {
+const handleOutgoingChat = () => {
+    try {
+        userMessage = chatInput.value.trim(); // Get chatInput value and remove extra spaces
+        if (!userMessage) return;
+
+        if (selectedChat === 'new-chat' || selectedChat === null) {
+            chatContainer.innerHTML = "";
+        }
+
+        selectedContentType = "text";
+
+        if (EXTRACT_IMAGE_REGEX.test(userMessage)) {
+            const foundImageResolution = userMessage.replace(EXTRACT_IMAGE_REGEX, "$1");
+            userMessage = userMessage.replace(EXTRACT_IMAGE_REGEX, "$2");
+
+            if (foundImageResolution) {
+                if (!ALLOWED_RESOLUTIONS.includes(foundImageResolution)) {
+                    throw new Error("The resolution that you requested is not one of the allowed resolutions:\n256x256\n512x512\n1024x1024\n1024x1792\n1792x1024\nPlease pick of these resolutions if you won\'t pick one then by default it will be 1792x1024")
+                }
+                imageResolution = foundImageResolution
+            }
+
+            selectedContentType = "image";
+        }
+
+        const userMessageContent = {
+            role: "user",
+            type: "text",
+            content: [{ type: "text", text: userMessage }].concat(imageList),
+        }
+
+        let tempMessage = [...userMessageContent.content]
+
+        messages.push(userMessageContent);
+
+        if (selectedChat) {
+            saveToLocalStorage({ selectedChatID: selectedChat })
+        }
+
+        chatInput.value = "";
+        chatInput.style.height = `${initialInputHeight}px`;
+        chatContainer.querySelector(".default-text")?.remove();
+
+        if (selectedChat === 'new-chat' || selectedChat === null) {
+            const html = formattedHTML({ role: "user", type: "text", content: tempMessage });
+            chatContainer.innerHTML += html;
+        }
+
+        chatContainer.scrollTo(0, chatContainer.scrollHeight);
+        setTimeout(showTypingAnimation, 500);
+    } catch (error) {
+        const html = formattedHTML({ role: "user", type: "text", content: userMessage });
+        chatContainer.innerHTML += html;
+        createMessageElement({ role: "assistant", type: "text", content: error.message, error: true })
+    }
+}
+
+const formattedHTML = ({ role, type = "text", content = null, loading = false, error = false }) => {
     if (loading) {
         document.title = "Jpty\'s thinking"
     }
@@ -268,15 +294,16 @@ const formattedHTML = (role, type = "text", message = null, loading = false) => 
     return `
     <div class='chat ${role === "user" ? "outgoing" : "incoming"}'>
     <div class="chat-content">` +
-        `<div class="chat-details">
+        `<div class="chat-details ${error ? "error" : ""}">
             ${role === "user" ? `<img src="images/monica.jpg" alt="monica-img"></img>` : `<img src="images/chatbot.jpg" alt="chatbot-img"></img>`}
-            <div class="message-content">${role === "assistant" && loading && message === null ?
+            <div class="message-content">` +
+        `${role === "assistant" && loading && content === null ?
             `<div class="typing-animation">
                 <div class="typing-dot" style="--delay: 0.2s"></div>
                 <div class="typing-dot" style="--delay: 0.3s"></div>
                 <div class="typing-dot" style="--delay: 0.4s"></div>
             </div>` :
-            createFormattedMessage(type, message, role === "user")
+            createFormattedMessage(type, content, role === "user", error)
         }</div>` +
         `<span onclick="copyResponse(this,'${type === "text" ? "div" : ".message-content img"}')" class="material-symbols-rounded copy-btn">content_copy</span>
             </div>
@@ -284,17 +311,23 @@ const formattedHTML = (role, type = "text", message = null, loading = false) => 
     </div>`;
 }
 
-const createFormattedMessage = (type, message, isUser) => {
+const createFormattedMessage = (type, message, isUser, error) => {
     const newDiv = document.createElement("div");
+
     newDiv.innerHTML = `${isUser ?
         formatUserMessage(type, message) :
-        formattedMessage(message)}`;
+        formattedMessage(message, error)}
+        `;
 
     highlightCode(newDiv);
-    return newDiv.innerHTML;
+    return newDiv.innerHTML.trim();
 }
 
 const formatUserMessage = (type, message) => {
+    message = type == "text" ? message[0].text.replace(ANGLE_BRACKET_REGEX, (match) => {
+        return match === "<" ? "&lt;" : "&gt;"
+    }) : message;
+
     return type === "text" ?
         (Array.isArray(message) ? `<div class="message-images">` +
             message.filter((_, idx) => idx !== 0).map(img => {
@@ -305,6 +338,10 @@ const formatUserMessage = (type, message) => {
 }
 
 const formattedMessage = (newMessage) => {
+    if (newMessage?.image) {
+        return `<img src="${newMessage.image}" alt="${newMessage.alt}" />`
+    }
+
     newMessage = newMessage.replaceAll(ANGLE_BRACKET_REGEX, (match) => {
         return match === "<" ? "&lt;" : "&gt;"
     });
@@ -364,16 +401,23 @@ const createNewChat = async ({ id, name, category, before = false, selectedID = 
     deleteButton.textContent = "delete";
 
     if (firstMessage) {
-        const messageToSummarize = { role: "user", content: messages[1].content };
+        const messageToSummarize = { role: "user", content: messages[1].content.alt ?? messages[1].content };
         messageToSummarize.content = `summarize in 1-5 words this message: ${messageToSummarize.content}`
         delete messageToSummarize.type;
 
-        const body = createResponseBody({ model: "gpt-3.5-turbo-0125", selectedContentType, messages: [messageToSummarize] })
-        const response = await createResponse({ body })
-        const data = await response.json();
+        try {
+            const body = createResponseBody({ model: "gpt-3.5-turbo-0125", selectedContentType: "text", messages: [messageToSummarize], gpt3: true })
 
-        sidebarItemTitle.textContent = data.choices[0].message.content;
-        name = data.choices[0].message.content;
+            const response = await createResponse({ body })
+            const data = await response.json();
+
+            if (data.error) throw new Error(data)
+
+            sidebarItemTitle.textContent = data.choices[0].message.content;
+            name = data.choices[0].message.content;
+        } catch (error) {
+            console.error(error)
+        }
     } else {
         sidebarItemTitle.textContent = name;
     }

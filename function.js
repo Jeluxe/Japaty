@@ -115,10 +115,11 @@ const categorizedDate = (date) => {
   const MONTH = DAY * 30;
   const YEAR = DAY * 365;
   const diffrence = Date.now() - date;
-  if (new Date(date).getDate() === new Date().getDate() - 1) {
-    return "Yesterday";
-  } else if (diffrence < DAY) {
-    return "Today"
+
+  if (diffrence < DAY) {
+    return "Today";
+  } else if (diffrence < DAY * 2) {
+    return "Yesterday"
   } else if (diffrence <= WEEK) {
     return "Past Week";
   } else if (diffrence <= MONTH) {
@@ -127,6 +128,8 @@ const categorizedDate = (date) => {
     return "Past 3 Months";
   } else if (diffrence <= YEAR) {
     return "Past Year";
+  } else {
+    return "Older";
   }
 }
 

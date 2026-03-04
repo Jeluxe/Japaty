@@ -799,9 +799,10 @@ const showFile = () => {
             let img = document.createElement("img");
             let removeBtn = document.createElement("button");
 
-            imageWrapper.classList.add("image-wrapper")
+            imageWrapper.classList.add("image-wrapper");
             removeBtn.classList.add("remove-image-buttons");
             img.src = fileURL;
+            img.draggable = false;
             removeBtn.innerHTML = "X"
             removeBtn.onclick = removeImage;
 

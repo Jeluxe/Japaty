@@ -218,17 +218,17 @@ code {
   width: 6px;
 }
 
-:where(.chat-container, textarea, .sidebar-wrapper, code)::-webkit-scrollbar-track {
+:where(.chat-container, textarea, .sidebar-wrapper, code, .image-input-container)::-webkit-scrollbar-track {
   background: transparent;
   border-radius: 25px;
 }
 
-:where(.chat-container, textarea, .sidebar-wrapper, code)::-webkit-scrollbar-thumb {
+:where(.chat-container, textarea, .sidebar-wrapper, code, .image-input-container)::-webkit-scrollbar-thumb {
   background: var(--icon-color);
   border-radius: 25px;
 }
 
-:where(code)::-webkit-scrollbar {
+:where(code, .image-input-container)::-webkit-scrollbar {
   height: 6px;
 }
 
@@ -391,6 +391,7 @@ span.material-symbols-rounded {
 .image-input-container {
   height: 70px;
   display: none;
+  overflow: scroll hidden;
 }
 
 .image-input-container .image-wrapper {
@@ -486,6 +487,10 @@ span.material-symbols-rounded {
   align-items: center;
   justify-content: center;
   color: var(--icon-color);
+}
+
+#chat-input {
+  min-height: 55px;
 }
 
 .typing-upload {
@@ -723,6 +728,10 @@ span.material-symbols-rounded {
 
   #sm-dropdown {
     height: 30px;
+  }
+
+  #chat-input {
+    min-height: 45px;
   }
 
   .typing-content span {

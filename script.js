@@ -315,7 +315,7 @@ const createFormattedMessage = (type, message, isUser, error) => {
     const newDiv = document.createElement("div");
 
     newDiv.innerHTML = `${isUser ?
-        formatUserMessage(type, message) :
+        formatUserContent(type, message) :
         formattedMessage(message, error)}
         `;
 
@@ -323,18 +323,18 @@ const createFormattedMessage = (type, message, isUser, error) => {
     return newDiv.innerHTML.trim();
 }
 
-const formatUserMessage = (type, message) => {
-    message = type == "text" ? message[0].text.replace(ANGLE_BRACKET_REGEX, (match) => {
+const formatUserContent = (type, content) => {
+    content[0] = type == "text" ? (content[0].text || content[0] || content)?.replace(ANGLE_BRACKET_REGEX, (match) => {
         return match === "<" ? "&lt;" : "&gt;"
-    }) : message;
+    }) : content;
 
     return type === "text" ?
-        (Array.isArray(message) ? `<div class="message-images">` +
-            message.filter((_, idx) => idx !== 0).map(img => {
+        (Array.isArray(content) ? `<div class="message-images">` +
+            content.filter((_, idx) => idx !== 0).map(img => {
                 return `<img src="${img.image_url.url}" />`
             }) : "") +
         `</div>` +
-        `<p>${message[0].text || message}</p>` : `<img src="${message.image}" alt="${message.alt}" />`
+        `<p>${content[0].text || content}</p>` : `<img src="${content.image}" alt="${content.alt}" />`
 }
 
 const formattedMessage = (newMessage) => {
@@ -653,13 +653,13 @@ const sortChatsByDates = (chats) => {
         "Past Week": [],
         "Past Month": [],
         "Past 3 Months": [],
-        "Past Year": []
+        "Past Year": [],
+        "Older": []
     }
-
     let chatRecords = Object.entries(chats);
 
     for (let chat of chatRecords) {
-        const chatDate = new Date(chat[1].edited_at ?? chat[1].created_at).getTime()
+        const chatDate = new Date(chat[1].edited_at ?? chat[1].created_at).getTime();
         const dateCategory = categorizedDate(chatDate);
 
         if (sortedChats.hasOwnProperty(dateCategory)) {
@@ -787,7 +787,7 @@ const showFile = () => {
     if (!file) return;
 
     let fileType = file.type;
-    let validExtensions = ["image/jpeg", "image/jpg", "image/png"];
+    let validExtensions = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
     if (validExtensions.includes(fileType) && imageList.length < 10) {
         imageInputContainer.style.display = "flex";
         let fileReader = new FileReader();
@@ -811,9 +811,15 @@ const showFile = () => {
             imageInputContainer.appendChild(imageWrapper)
         }
         fileReader.readAsDataURL(file);
-    } else {
-        alert("puu puu not valid file type")
     }
+    else if (imageList.length < 10) {
+        alert("puu puu you have hit max files selection!")
+    }
+    else {
+        alert("puu puu not valid file type")
+        file = null;
+    }
+    fileUpload.value = "";
 }
 
 const removeImage = (e) => {
